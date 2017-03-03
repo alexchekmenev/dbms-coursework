@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DBMS Coursework</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel="stylesheet" href="https://vctrfrnndz.github.io/jquery-accordion/css/jquery.accordion.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+<body>
+
+<h1>DBMS Coursework</h1>
+
+<div data-accordion-group>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Physical Data Model ✔</div>
+        <div data-content style="text-align: center">
+            <img src="images/pdm.png" style="width: 95%">
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>SQL structure ✔</div>
+        <div data-content>
+            <div>
+                <div data-accordion-group>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Category</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `Category` (
+	`id` int(11) NOT NULL,
+	`lft` int(11) NOT NULL UNIQUE,
+	`rgt` int(11) NOT NULL UNIQUE,
+	`name` varchar(50) NOT NULL,
+	PRIMARY KEY (`id`)
+);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>City</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `City` (
+	`id` int(11) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`shopCount` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Product</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `Product` (
+	`id` int(11) NOT NULL,
+	`vendor_id` int(11) NOT NULL,
+	`category_id` int(11) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`price` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `Product` ADD CONSTRAINT `Product_fk0` FOREIGN KEY (`vendor_id`) REFERENCES `Vendor`(`id`);
+ALTER TABLE `Product` ADD CONSTRAINT `Product_fk1` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>ProductShop</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `ProductShop` (
+	`product_id` int(11) NOT NULL,
+	`shop_id` int(11) NOT NULL,
+	`count` int(11) NOT NULL DEFAULT 0,
+	PRIMARY KEY (`product_id`,`shop_id`)
+);
+
+ALTER TABLE `ProductShop` ADD CONSTRAINT `ProductShop_fk0` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`);
+ALTER TABLE `ProductShop` ADD CONSTRAINT `ProductShop_fk1` FOREIGN KEY (`shop_id`) REFERENCES `Shop`(`id`);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Review</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `Review` (
+	`id` int(11) NOT NULL,
+	`product_id` int(11) NOT NULL,
+	`text` varchar(1000) NOT NULL,
+	`points` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `Review` ADD CONSTRAINT `Review_fk0` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Shop</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `Shop` (
+	`id` int(11) NOT NULL,
+	`name` varchar(50) NOT NULL UNIQUE,
+	`address` varchar(50) NOT NULL,
+	`city_id` int(11) NOT NULL,
+	`productCount` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `Shop` ADD CONSTRAINT `Shop_fk0` FOREIGN KEY (`city_id`) REFERENCES `City`(`id`);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Vendor</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TABLE `Vendor` (
+	`id` int(11) NOT NULL,
+	`name` varchar(50) NOT NULL UNIQUE,
+	PRIMARY KEY (`id`)
+);</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Indexes</div>
+        <div data-content>
+            <div>
+                <div data-accordion-group>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Control</div>
+                        <div data-content>
+                            <div>Row</div>
+                            <div>Row</div>
+                            <div>Row</div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Control</div>
+                        <div data-content>
+                            <div>Row</div>
+                            <div>Row</div>
+                            <div>Row</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Stored procedures</div>
+        <div data-content>
+            <div>Row</div>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Triggers</div>
+        <div data-content>
+            <div>Row</div>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Queries</div>
+        <div data-content>
+            <div>Row</div>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Test data</div>
+        <div data-content>
+            <div>
+                <div data-accordion-group>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Raw SQL</div>
+                        <div data-content>
+                            <div>Row</div>
+                            <div>Row</div>
+                            <div>Row</div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Init script</div>
+                        <div data-content>
+                            <script src="https://gist.github.com/alexchekmenev/d373aec961b57e576532610675fd8ca4.js"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<script src="js/lang-sql.js"></script>
+<script src="https://rawgit.com/vctrfrnndz/jquery-accordion/master/js/jquery.accordion.js"></script>
+<script>
+    $('.accordion').accordion({
+        "transitionSpeed": 300,
+        singleOpen: true
+    });
+</script>
+</body>
+</html>

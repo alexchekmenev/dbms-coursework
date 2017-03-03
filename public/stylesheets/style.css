@@ -1,0 +1,26 @@
+body {
+  padding: 10px 50px;
+  #font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
+  background: url("../images/cheap_diagonal_fabric.png") repeat;
+}
+
+h1 {
+  font-family: "Roboto","Helvetica",Helvetica,Arial,sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  margin: 10px auto;
+}
+
+a {
+  color: #00B7FF;
+}
+
+div[data-control] {
+  font-weight: bold;
+}
+
+.accordion {
+  background-color: rgba(255,255,255,0.3);
+}
+
