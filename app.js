@@ -5,9 +5,13 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
+var mysql = require('mysql');
+var config = require('./config');
+var pool  = mysql.createPool(config);
 
 var app = express();
+
+app.set('pool', pool);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,7 +25,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var index = require('./routes/index');
+var categories = require('./routes/categories');
+var reviews = require('./routes/reviews');
+var shops = require('./routes/shops');
+var products = require('./routes/products');
+
 app.use('/', index);
+app.use('/categories', categories);
+app.use('/reviews', reviews);
+app.use('/shops', shops);
+app.use('/products', products);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -14,14 +14,24 @@
 <div data-accordion-group>
 
     <div class="accordion" data-accordion>
-        <div data-control>Physical Data Model ✔</div>
+        <div data-control>Entity-Relation Model</div>
+        <div data-content style="text-align: center">
+            <iframe src="https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=market.html#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D0B-WRj4_Rb9T-LVgxMloxbFRJSkU%26export%3Ddownload"
+                    height="600px" align="left" style="width: 95%">
+                Ваш браузер не поддерживает плавающие фреймы!
+            </iframe>
+        </div>
+    </div>
+
+    <div class="accordion" data-accordion>
+        <div data-control>Physical Data Model</div>
         <div data-content style="text-align: center">
             <img src="images/pdm.png" style="width: 95%">
         </div>
     </div>
 
     <div class="accordion" data-accordion>
-        <div data-control>SQL structure ✔</div>
+        <div data-control>SQL structure</div>
         <div data-content>
             <div>
                 <div data-accordion-group>
@@ -98,7 +108,7 @@ ALTER TABLE `ProductShop` ADD CONSTRAINT `ProductShop_fk1` FOREIGN KEY (`shop_id
 CREATE TABLE `Review` (
 	`id` int(11) NOT NULL,
 	`product_id` int(11) NOT NULL,
-	`text` varchar(1000) NOT NULL,
+	`description` varchar(1000) NOT NULL,
 	`points` int(11) NOT NULL,
 	PRIMARY KEY (`id`)
 );
@@ -147,21 +157,40 @@ CREATE TABLE `Vendor` (
         <div data-control>Indexes</div>
         <div data-content>
             <div>
+
                 <div data-accordion-group>
                     <div class="accordion" data-accordion>
-                        <div data-control>Control</div>
+                        <div data-control>Product</div>
                         <div data-content>
-                            <div>Row</div>
-                            <div>Row</div>
-                            <div>Row</div>
+                            <div>
+<pre class="prettyprint lang-sql">
+CREATE INDEX Product_category_id ON Product(category_id) USING BTREE;
+CREATE INDEX Product_name ON Product(name) USING BTREE;
+CREATE INDEX Product_vendor_id ON Product(vendor_id) USING BTREE;
+</pre>
+                            </div>
                         </div>
                     </div>
                     <div class="accordion" data-accordion>
-                        <div data-control>Control</div>
+                        <div data-control>Shop</div>
                         <div data-content>
-                            <div>Row</div>
-                            <div>Row</div>
-                            <div>Row</div>
+                            <div>
+<pre class="prettyprint lang-sql">
+CREATE INDEX Shop_name ON Shop(name) USING BTREE;
+CREATE INDEX Shop_city_id ON Shop(city_id) USING BTREE;
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Review</div>
+                        <div data-content>
+                            <div>
+<pre class="prettyprint lang-sql">
+CREATE INDEX Review_product_id ON Review(product_id) USING BTREE;
+CREATE INDEX Review_product_id_points ON Review(product_id, points) USING BTREE;
+</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,21 +201,159 @@ CREATE TABLE `Vendor` (
     <div class="accordion" data-accordion>
         <div data-control>Stored procedures</div>
         <div data-content>
-            <div>Row</div>
+            <div>
+                <pre class="prettyprint lang-sql">
+DELIMITER $$
+
+CREATE PROCEDURE `addCategory`(IN `categoryId` INT(11), IN `name` VARCHAR(50) CHARSET utf8)
+    NO SQL
+BEGIN    
+    SELECT @myLeft := lft FROM Category WHERE `id` = categoryId;
+    
+    UPDATE Category SET rgt = rgt + 2 WHERE rgt > @myLeft;
+    UPDATE Category SET lft = lft + 2 WHERE lft > @myLeft;
+    
+    INSERT INTO Category(`name`, `lft`, `rgt`) VALUES(name, @myLeft + 1, @myLeft + 2);
+END$$
+
+CREATE PROCEDURE `addProduct`(IN `categoryId` INT, IN `vendorId` INT, IN `name` VARCHAR(50), IN `price` INT)
+    NO SQL
+BEGIN    
+   INSERT INTO Product(`category_id`, `vendor_id`, `name`, `price`) VALUES (categoryId, vendorId, name, price);
+END$$
+
+CREATE PROCEDURE `addReview`(IN `productId` INT, IN `textt` VARCHAR(1000), IN `points` INT)
+    NO SQL
+BEGIN    
+   INSERT INTO Review(`product_id`, `text`, `points`) VALUES (productId, textt, points);
+END$$
+
+CREATE PROCEDURE `addShop`(IN `name` VARCHAR(50), IN `address` VARCHAR(50), IN `cityId` INT(11))
+    NO SQL
+BEGIN
+	SELECT MAX(id) INTO @max_id FROM Shop WHERE 1;
+	INSERT INTO Shop (id, `name`, `address`, `city_id`, `productCount`) VALUES (@max_id + 1, name, address, cityId, 0);
+END$$
+
+CREATE PROCEDURE `addVendor`(IN `vendorName` VARCHAR(50))
+    NO SQL
+BEGIN    
+   INSERT INTO Vendor(`name`) VALUES (vendorName);
+END$$
+
+CREATE PROCEDURE `buyProduct`(IN `productId` INT, IN `shopId` INT, IN `cnt` INT)
+    NO SQL
+BEGIN
+	UPDATE ProductShop SET `count` = `count` - cnt WHERE `product_id` = productId AND `shop_id` = shopId;
+END$$
+
+CREATE PROCEDURE `deliverProduct`(IN `productId` INT, IN `shopId` INT, IN `cnt` INT)
+    NO SQL
+BEGIN
+	INSERT INTO ProductShop(`product_id`, `shop_id`, `count`) VALUES (productId, shopId, 1) ON DUPLICATE KEY UPDATE `count` = `count` + cnt;
+END$$
+
+CREATE PROCEDURE `getCategoryProducts`(IN `categoryId` INT(11))
+    NO SQL
+SELECT * FROM `Product` WHERE `category_id` = categoryId$$
+
+CREATE PROCEDURE `getProductReviews`(IN `productId` INT(11))
+    NO SQL
+SELECT * FROM `Review` WHERE `product_id` = productId$$
+
+CREATE PROCEDURE `getShopsInCity`(IN `cityId` INT(11))
+    NO SQL
+BEGIN
+	SELECT * FROM Shop WHERE city_id = cityId;
+END$$
+
+CREATE PROCEDURE `getShopsWithProduct`(IN `productId` INT(11))
+    NO SQL
+SELECT Shop.* FROM ProductShop INNER JOIN `Shop` ON (ProductShop.shop_id = Shop.id)
+WHERE `product_id` = productId$$
+
+CREATE PROCEDURE `getShopsWithProductInCity`(IN `productId` INT(11), IN `cityId` INT(11))
+    NO SQL
+BEGIN
+	SELECT * 
+	FROM (SELECT shop_id FROM ProductShop WHERE product_id = productId) AS PS INNER JOIN Shop ON (PS.shop_id = Shop.id)
+	WHERE Shop.city_id = cityId;
+END$$
+
+CREATE PROCEDURE `removeCategory`(IN `categoryId` INT(11))
+    NO SQL
+BEGIN
+    SELECT @myLeft := lft, @myRight := rgt, @myWidth := rgt - lft + 1
+    FROM Category
+    WHERE `id` = categoryId;
+    
+    DELETE FROM Category WHERE lft BETWEEN @myLeft AND @myRight;
+    
+    UPDATE Category SET rgt = rgt - @myWidth WHERE rgt > @myRight;
+    UPDATE Category SET lft = lft - @myWidth WHERE lft > @myRight;
+END$$
+
+CREATE PROCEDURE `searchProductsByName`(IN `pName` VARCHAR(50))
+    NO SQL
+BEGIN
+	SELECT * FROM Product WHERE name LIKE CONCAT('%', pName , '%');
+END$$
+
+CREATE PROCEDURE `searchShopsInCity`(IN `cityId` INT(11), IN `s` VARCHAR(50), IN `e` INT)
+    NO SQL
+BEGIN
+	IF (e = 1) then 
+		EXPLAIN SELECT * FROM Shop WHERE city_id = cityId AND name LIKE CONCAT('%', s , '%');
+    ELSE
+    	SELECT * FROM Shop WHERE city_id = cityId AND name LIKE CONCAT('%', s , '%');
+    end if;
+END$$</pre>
+            </div>
         </div>
     </div>
 
     <div class="accordion" data-accordion>
         <div data-control>Triggers</div>
         <div data-content>
-            <div>Row</div>
-        </div>
-    </div>
-
-    <div class="accordion" data-accordion>
-        <div data-control>Queries</div>
-        <div data-content>
-            <div>Row</div>
+            <div>
+                <div data-accordion-group>
+                    <div class="accordion" data-accordion>
+                        <div data-control>ProductShop</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TRIGGER `change_product_count` AFTER UPDATE ON `ProductShop`
+ FOR EACH ROW BEGIN
+	IF (OLD.count = 0 AND NEW.count > 0) THEN
+    	UPDATE Shop SET productCount = productCount + 1 WHERE id = NEW.shop_id;
+    ELSEIF (OLD.count > 0 && NEW.count = 0) THEN
+    	UPDATE Shop SET productCount = productCount - 1 WHERE id = NEW.shop_id;
+    END IF;
+END</pre>
+                                <pre class="prettyprint lang-sql">
+CREATE TRIGGER `set_product_count` AFTER INSERT ON `ProductShop`
+ FOR EACH ROW BEGIN
+	IF (NEW.count > 0) THEN
+    	UPDATE Shop SET productCount = productCount + 1 WHERE id = NEW.shop_id;
+    END IF;
+END</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" data-accordion>
+                        <div data-control>Shop</div>
+                        <div data-content>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+CREATE TRIGGER `change_city_shop_count` AFTER INSERT ON `Shop`
+    FOR EACH ROW BEGIN
+        UPDATE City SET shopCount = shopCount + 1 WHERE id = NEW.city_id;
+    END</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -198,9 +365,37 @@ CREATE TABLE `Vendor` (
                     <div class="accordion" data-accordion>
                         <div data-control>Raw SQL</div>
                         <div data-content>
-                            <div>Row</div>
-                            <div>Row</div>
-                            <div>Row</div>
+                            <div>
+                                <pre class="prettyprint lang-sql">
+INSERT INTO `Category` (`id`, `lft`, `rgt`, `name`) VALUES
+(1, 1, 16, 'All items'),
+(2, 2, 15, 'Electronics'),
+(3, 9, 14, 'Smartphones'),
+(4, 12, 13, 'iOS'),
+(5, 10, 11, 'Android'),
+(6, 7, 8, 'Laptops'),
+(7, 5, 6, 'Smart-watches'),
+(8, 3, 4, 'TV');
+
+INSERT INTO `City` (`id`, `name`, `shopCount`) VALUES
+(1, 'Saint-Petersburg', 0),
+(2, 'Moscow', 0),
+(3, 'Stavropol', 0),
+(4, 'Saratov', 0),
+(5, 'Krasnodar', 0);
+
+INSERT INTO `Vendor` (`id`, `name`) VALUES
+(1, 'Apple'),
+(6, 'Huawei'),
+(2, 'LG'),
+(9, 'Meizu'),
+(8, 'Nokia'),
+(10, 'Nubia'),
+(5, 'OnePlus'),
+(4, 'Oppo'),
+(7, 'Samsung'),
+(3, 'Xiaomi');</pre>
+                            </div>
                         </div>
                     </div>
                     <div class="accordion" data-accordion>
