@@ -25,8 +25,8 @@
 
     <div class="accordion" data-accordion>
         <div data-control>Physical Data Model</div>
-        <div data-content style="text-align: center">
-            <img src="images/pdm.png" style="width: 95%">
+        <div data-content>
+            <a href="https://dbdesigner.net/designer/schema/73005">DbDesigner</a>
         </div>
     </div>
 
@@ -34,121 +34,221 @@
         <div data-control>SQL structure</div>
         <div data-content>
             <div>
-                <div data-accordion-group>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Category</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `Category` (
-	`id` int(11) NOT NULL,
-	`lft` int(11) NOT NULL UNIQUE,
-	`rgt` int(11) NOT NULL UNIQUE,
-	`name` varchar(50) NOT NULL,
-	PRIMARY KEY (`id`)
-);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>City</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `City` (
-	`id` int(11) NOT NULL,
-	`name` varchar(50) NOT NULL,
-	`shopCount` int(11) NOT NULL,
-	PRIMARY KEY (`id`)
-);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Product</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `Product` (
-	`id` int(11) NOT NULL,
-	`vendor_id` int(11) NOT NULL,
-	`category_id` int(11) NOT NULL,
-	`name` varchar(50) NOT NULL,
-	`price` int(11) NOT NULL,
-	PRIMARY KEY (`id`)
+                <pre class="prettyprint lang-sql">
+CREATE TABLE Product (
+	id int NOT NULL,
+	vendor_id int NOT NULL,
+	category_id int NOT NULL,
+	name varchar(256) NOT NULL,
+	image_url varchar(256) NOT NULL,
+	rating FLOAT NOT NULL,
+	PRIMARY KEY (id)
 );
 
-ALTER TABLE `Product` ADD CONSTRAINT `Product_fk0` FOREIGN KEY (`vendor_id`) REFERENCES `Vendor`(`id`);
-ALTER TABLE `Product` ADD CONSTRAINT `Product_fk1` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>ProductShop</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `ProductShop` (
-	`product_id` int(11) NOT NULL,
-	`shop_id` int(11) NOT NULL,
-	`count` int(11) NOT NULL DEFAULT 0,
-	PRIMARY KEY (`product_id`,`shop_id`)
+CREATE TABLE Vendor (
+	id int NOT NULL UNIQUE,
+	name varchar(50) NOT NULL UNIQUE,
+	PRIMARY KEY (id)
 );
 
-ALTER TABLE `ProductShop` ADD CONSTRAINT `ProductShop_fk0` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`);
-ALTER TABLE `ProductShop` ADD CONSTRAINT `ProductShop_fk1` FOREIGN KEY (`shop_id`) REFERENCES `Shop`(`id`);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Review</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `Review` (
-	`id` int(11) NOT NULL,
-	`product_id` int(11) NOT NULL,
-	`description` varchar(1000) NOT NULL,
-	`points` int(11) NOT NULL,
-	PRIMARY KEY (`id`)
+CREATE TABLE Shop (
+	id int NOT NULL UNIQUE,
+	name varchar(50) NOT NULL UNIQUE,
+	address varchar(50) NOT NULL,
+	city_id int NOT NULL,
+	rating FLOAT NOT NULL,
+	PRIMARY KEY (id)
 );
 
-ALTER TABLE `Review` ADD CONSTRAINT `Review_fk0` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Shop</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `Shop` (
-	`id` int(11) NOT NULL,
-	`name` varchar(50) NOT NULL UNIQUE,
-	`address` varchar(50) NOT NULL,
-	`city_id` int(11) NOT NULL,
-	`productCount` int(11) NOT NULL,
-	PRIMARY KEY (`id`)
+CREATE TABLE ProductShop (
+	product_id int NOT NULL,
+	shop_id int NOT NULL,
+	cnt int NOT NULL DEFAULT '0',
+	delivery_type varchar(50) NOT NULL,
+	price FLOAT NOT NULL,
+	PRIMARY KEY (product_id,shop_id)
 );
 
-ALTER TABLE `Shop` ADD CONSTRAINT `Shop_fk0` FOREIGN KEY (`city_id`) REFERENCES `City`(`id`);</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Vendor</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
-CREATE TABLE `Vendor` (
-	`id` int(11) NOT NULL,
-	`name` varchar(50) NOT NULL UNIQUE,
-	PRIMARY KEY (`id`)
-);</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+CREATE TABLE Category (
+	id int NOT NULL,
+	lft int NOT NULL UNIQUE,
+	rgt int NOT NULL UNIQUE,
+	name varchar(50) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE ProductReview (
+	id int NOT NULL,
+	product_id int NOT NULL,
+	comment varchar(1000) NOT NULL,
+	points int NOT NULL,
+	pros varchar(256) NOT NULL,
+	created TIMESTAMP NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE City (
+	id int NOT NULL,
+	name varchar(50) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Attribute (
+	id int NOT NULL,
+	name varchar(50) NOT NULL,
+	data_type varchar(50) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE CategoryAttributeValueTimestamp (
+	attribute_id int NOT NULL,
+	category_id int NOT NULL,
+	attribute_value TIMESTAMP NOT NULL,
+	PRIMARY KEY (attribute_id,category_id)
+);
+
+CREATE TABLE CategoryAttributeValueInt (
+	attribute_id int NOT NULL,
+	category_id int NOT NULL,
+	attribute_value int NOT NULL,
+	PRIMARY KEY (attribute_id,category_id)
+);
+
+CREATE TABLE CategoryAttributeValueFloat (
+	attribute_id int NOT NULL,
+	category_id int NOT NULL,
+	attribute_value FLOAT NOT NULL,
+	PRIMARY KEY (attribute_id,category_id)
+);
+
+CREATE TABLE CategoryAttributeValueVarchar (
+	attribute_id int NOT NULL,
+	category_id int NOT NULL,
+	attribute_value varchar(256) NOT NULL,
+	PRIMARY KEY (attribute_id,category_id)
+);
+
+CREATE TABLE ProductAttributeValueTimestamp (
+	attribute_id int NOT NULL,
+	product_id int NOT NULL,
+	attribute_value TIMESTAMP NOT NULL,
+	PRIMARY KEY (attribute_id,product_id)
+);
+
+CREATE TABLE ProductAttributeValueInt (
+	attribute_id int NOT NULL,
+	product_id int NOT NULL,
+	attribute_value int NOT NULL,
+	PRIMARY KEY (attribute_id,product_id)
+);
+
+CREATE TABLE ProductAttributeValueVarchar (
+	attribute_id int NOT NULL,
+	product_id int NOT NULL,
+	attribute_value varchar(256) NOT NULL,
+	PRIMARY KEY (attribute_id,product_id)
+);
+
+CREATE TABLE ProductAttributeValueFloat (
+	attribute_id int NOT NULL,
+	product_id int NOT NULL,
+	attribute_value FLOAT NOT NULL,
+	PRIMARY KEY (attribute_id,product_id)
+);
+
+CREATE TABLE ShopReview (
+	id int NOT NULL,
+	shop_id int NOT NULL,
+	comment varchar(1000) NOT NULL,
+	points int NOT NULL,
+	pros varchar(256) NOT NULL,
+	created TIMESTAMP NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE ProductCity (
+	product_id int NOT NULL,
+	city_id int NOT NULL,
+	min_price FLOAT NOT NULL,
+	avg_price FLOAT NOT NULL,
+	max_price FLOAT NOT NULL,
+	PRIMARY KEY (product_id,city_id)
+);
+
+
+CREATE TABLE Comment (
+	id int NOT NULL,
+	product_id int NOT NULL,
+	parent_id int NOT NULL,
+	body varchar(1000) NOT NULL,
+	username varchar(50) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Overview (
+	id int NOT NULL,
+	product_id int NOT NULL,
+	url varchar(256) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+ALTER TABLE Product ADD CONSTRAINT Product_fk0 FOREIGN KEY (vendor_id) REFERENCES Vendor(id);
+
+ALTER TABLE Product ADD CONSTRAINT Product_fk1 FOREIGN KEY (category_id) REFERENCES Category(id);
+
+ALTER TABLE Shop ADD CONSTRAINT Shop_fk0 FOREIGN KEY (city_id) REFERENCES City(id);
+
+ALTER TABLE ProductShop ADD CONSTRAINT ProductShop_fk0 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ProductShop ADD CONSTRAINT ProductShop_fk1 FOREIGN KEY (shop_id) REFERENCES Shop(id);
+
+ALTER TABLE ProductReview ADD CONSTRAINT ProductReview_fk0 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE CategoryAttributeValueTimestamp ADD CONSTRAINT CategoryAttributeValueTimestamp_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE CategoryAttributeValueTimestamp ADD CONSTRAINT CategoryAttributeValueTimestamp_fk1 FOREIGN KEY (category_id) REFERENCES Category(id);
+
+ALTER TABLE CategoryAttributeValueInt ADD CONSTRAINT CategoryAttributeValueInt_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE CategoryAttributeValueInt ADD CONSTRAINT CategoryAttributeValueInt_fk1 FOREIGN KEY (category_id) REFERENCES Category(id);
+
+ALTER TABLE CategoryAttributeValueFloat ADD CONSTRAINT CategoryAttributeValueFloat_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE CategoryAttributeValueFloat ADD CONSTRAINT CategoryAttributeValueFloat_fk1 FOREIGN KEY (category_id) REFERENCES Category(id);
+
+ALTER TABLE CategoryAttributeValueVarchar ADD CONSTRAINT CategoryAttributeValueVarchar_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE CategoryAttributeValueVarchar ADD CONSTRAINT CategoryAttributeValueVarchar_fk1 FOREIGN KEY (category_id) REFERENCES Category(id);
+
+ALTER TABLE ProductAttributeValueTimestamp ADD CONSTRAINT ProductAttributeValueTimestamp_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE ProductAttributeValueTimestamp ADD CONSTRAINT ProductAttributeValueTimestamp_fk1 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ProductAttributeValueInt ADD CONSTRAINT ProductAttributeValueInt_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE ProductAttributeValueInt ADD CONSTRAINT ProductAttributeValueInt_fk1 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ProductAttributeValueVarchar ADD CONSTRAINT ProductAttributeValueVarchar_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE ProductAttributeValueVarchar ADD CONSTRAINT ProductAttributeValueVarchar_fk1 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ProductAttributeValueFloat ADD CONSTRAINT ProductAttributeValueFloat_fk0 FOREIGN KEY (attribute_id) REFERENCES Attribute(id);
+
+ALTER TABLE ProductAttributeValueFloat ADD CONSTRAINT ProductAttributeValueFloat_fk1 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ShopReview ADD CONSTRAINT ShopReview_fk0 FOREIGN KEY (shop_id) REFERENCES Shop(id);
+
+ALTER TABLE ProductCity ADD CONSTRAINT ProductCity_fk0 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE ProductCity ADD CONSTRAINT ProductCity_fk1 FOREIGN KEY (city_id) REFERENCES City(id);
+
+ALTER TABLE Comment ADD CONSTRAINT Comment_fk0 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+ALTER TABLE Comment ADD CONSTRAINT Comment_fk1 FOREIGN KEY (parent_id) REFERENCES Comment(id);
+
+ALTER TABLE Overview ADD CONSTRAINT Overview_fk0 FOREIGN KEY (product_id) REFERENCES Product(id);
+
+                                </pre>
             </div>
         </div>
     </div>
@@ -157,43 +257,42 @@ CREATE TABLE `Vendor` (
         <div data-control>Indexes</div>
         <div data-content>
             <div>
+<pre class="prettyprint lang-sql">
 
-                <div data-accordion-group>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Product</div>
-                        <div data-content>
-                            <div>
-<pre class="prettyprint lang-sql">
-CREATE INDEX Product_category_id ON Product(category_id) USING BTREE;
 CREATE INDEX Product_name ON Product(name) USING BTREE;
-CREATE INDEX Product_vendor_id ON Product(vendor_id) USING BTREE;
-</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Shop</div>
-                        <div data-content>
-                            <div>
-<pre class="prettyprint lang-sql">
+CREATE INDEX Product_category_id_name ON Product(category_id, name) USING BTREE;
+CREATE INDEX Product_vendor_id_category_id ON Product(vendor_id, category_id) USING BTREE;
+CREATE INDEX Product_vendor_id_category_id_name ON Product(vendor_id, category_id, name) USING BTREE;
+
+CREATE INDEX ProductShop_product_id_price ON ProductShop(product_id, price) USING BTREE;
+CREATE INDEX ProductShop_product_id_delivery_type ON ProductShop(product_id, delivery_type) USING BTREE;
+
+CREATE INDEX ProductCity_city_id_avg_price ON ProductCity(city_id, avg_price) USING BTREE;
+CREATE INDEX ProductCity_city_id_min_price ON ProductCity(city_id, min_price) USING BTREE;
+
+CREATE INDEX Attribute_name ON Attribute(name) USING BTREE;
+
+CREATE INDEX Vendor_name ON Vendor(name) USING BTREE;
+
 CREATE INDEX Shop_name ON Shop(name) USING BTREE;
-CREATE INDEX Shop_city_id ON Shop(city_id) USING BTREE;
+CREATE INDEX Shop_city_id_name ON Shop(city_id, name) USING BTREE;
+CREATE INDEX Shop_city_id_rating ON Shop(city_id, rating) USING BTREE;
+
+CREATE INDEX City_name ON City(name) USING BTREE;
+
+CREATE INDEX ShopReview_product_id_points ON ShopReview(shop_id, points) USING BTREE;
+CREATE INDEX ShopReview_product_id_created ON ShopReview(shop_id, created) USING BTREE;
+
+CREATE INDEX ProductReview_product_id_points ON ProductReview(product_id, points) USING BTREE;
+CREATE INDEX ProductReview_product_id_created ON ProductReview(product_id, created) USING BTREE;
+
+CREATE INDEX Comment_product_id_username ON Comment(product_id, username) USING BTREE;
+
+CREATE INDEX Category_name ON Category(name) USING BTREE;
+CREATE INDEX Category_range ON Category(lft, rgt) USING BTREE;
+CREATE INDEX Category_lft ON Category(lft) USING BTREE;
+CREATE INDEX Category_rft ON Category(rgt) USING BTREE;
 </pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Review</div>
-                        <div data-content>
-                            <div>
-<pre class="prettyprint lang-sql">
-CREATE INDEX Review_product_id ON Review(product_id) USING BTREE;
-CREATE INDEX Review_product_id_points ON Review(product_id, points) USING BTREE;
-</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -205,74 +304,56 @@ CREATE INDEX Review_product_id_points ON Review(product_id, points) USING BTREE;
                 <pre class="prettyprint lang-sql">
 DELIMITER $$
 
-CREATE PROCEDURE `addCategory`(IN `categoryId` INT(11), IN `name` VARCHAR(50) CHARSET utf8)
+CREATE PROCEDURE addProductReview(IN productId INT, IN comment VARCHAR(1000),
+                    IN pros VARCHAR(256), IN cons VARCHAR(256), IN points INT)
     NO SQL
 BEGIN    
-    SELECT @myLeft := lft FROM Category WHERE `id` = categoryId;
-    
-    UPDATE Category SET rgt = rgt + 2 WHERE rgt > @myLeft;
-    UPDATE Category SET lft = lft + 2 WHERE lft > @myLeft;
-    
-    INSERT INTO Category(`name`, `lft`, `rgt`) VALUES(name, @myLeft + 1, @myLeft + 2);
+   INSERT INTO ProductReview(product_id, comment, pros, cons, points) VALUES (productId, comment, pros, cons, points);
 END$$
 
-CREATE PROCEDURE `addProduct`(IN `categoryId` INT, IN `vendorId` INT, IN `name` VARCHAR(50), IN `price` INT)
-    NO SQL
-BEGIN    
-   INSERT INTO Product(`category_id`, `vendor_id`, `name`, `price`) VALUES (categoryId, vendorId, name, price);
-END$$
 
-CREATE PROCEDURE `addReview`(IN `productId` INT, IN `textt` VARCHAR(1000), IN `points` INT)
-    NO SQL
-BEGIN    
-   INSERT INTO Review(`product_id`, `text`, `points`) VALUES (productId, textt, points);
-END$$
-
-CREATE PROCEDURE `addShop`(IN `name` VARCHAR(50), IN `address` VARCHAR(50), IN `cityId` INT(11))
+CREATE PROCEDURE addShop(IN name VARCHAR(50), IN address VARCHAR(50), IN cityId INT(11))
     NO SQL
 BEGIN
 	SELECT MAX(id) INTO @max_id FROM Shop WHERE 1;
-	INSERT INTO Shop (id, `name`, `address`, `city_id`, `productCount`) VALUES (@max_id + 1, name, address, cityId, 0);
+	INSERT INTO Shop (id, name, address, city_id, rating) VALUES (@max_id + 1, name, address, cityId, 0);
 END$$
 
-CREATE PROCEDURE `addVendor`(IN `vendorName` VARCHAR(50))
+
+CREATE PROCEDURE addVendor(IN vendorName VARCHAR(50))
     NO SQL
 BEGIN    
-   INSERT INTO Vendor(`name`) VALUES (vendorName);
+   INSERT INTO Vendor(name) VALUES (vendorName);
 END$$
 
-CREATE PROCEDURE `buyProduct`(IN `productId` INT, IN `shopId` INT, IN `cnt` INT)
+
+CREATE PROCEDURE buyProduct(IN productId INT, IN shopId INT, IN q INT)
     NO SQL
 BEGIN
-	UPDATE ProductShop SET `count` = `count` - cnt WHERE `product_id` = productId AND `shop_id` = shopId;
+	UPDATE ProductShop SET cnt = cnt - q WHERE product_id = productId AND shop_id = shopId;
 END$$
 
-CREATE PROCEDURE `deliverProduct`(IN `productId` INT, IN `shopId` INT, IN `cnt` INT)
+CREATE PROCEDURE deliverProduct(IN productId INT, IN shopId INT, IN q INT)
     NO SQL
 BEGIN
-	INSERT INTO ProductShop(`product_id`, `shop_id`, `count`) VALUES (productId, shopId, 1) ON DUPLICATE KEY UPDATE `count` = `count` + cnt;
+	INSERT INTO ProductShop(product_id, shop_id, cnt) VALUES (productId, shopId, q) ON DUPLICATE KEY UPDATE cnt = cnt + q;
 END$$
 
-CREATE PROCEDURE `getCategoryProducts`(IN `categoryId` INT(11))
-    NO SQL
-SELECT * FROM `Product` WHERE `category_id` = categoryId$$
 
-CREATE PROCEDURE `getProductReviews`(IN `productId` INT(11))
+CREATE PROCEDURE getCategoryProducts(IN categoryId INT(11))
     NO SQL
-SELECT * FROM `Review` WHERE `product_id` = productId$$
+SELECT * FROM Product WHERE category_id = categoryId$$
 
-CREATE PROCEDURE `getShopsInCity`(IN `cityId` INT(11))
+CREATE PROCEDURE getProductReviews(IN productId INT(11))
     NO SQL
-BEGIN
-	SELECT * FROM Shop WHERE city_id = cityId;
-END$$
+SELECT * FROM Review WHERE product_id = productId$$
 
-CREATE PROCEDURE `getShopsWithProduct`(IN `productId` INT(11))
+CREATE PROCEDURE getShopsWithProduct(IN productId INT(11))
     NO SQL
-SELECT Shop.* FROM ProductShop INNER JOIN `Shop` ON (ProductShop.shop_id = Shop.id)
-WHERE `product_id` = productId$$
+SELECT Shop.* FROM ProductShop INNER JOIN Shop ON (ProductShop.shop_id = Shop.id)
+WHERE product_id = productId$$
 
-CREATE PROCEDURE `getShopsWithProductInCity`(IN `productId` INT(11), IN `cityId` INT(11))
+CREATE PROCEDURE getShopsWithProductInCity(IN productId INT(11), IN cityId INT(11))
     NO SQL
 BEGIN
 	SELECT * 
@@ -280,12 +361,23 @@ BEGIN
 	WHERE Shop.city_id = cityId;
 END$$
 
-CREATE PROCEDURE `removeCategory`(IN `categoryId` INT(11))
+CREATE PROCEDURE addCategory(IN categoryId INT(11), IN name VARCHAR(50) CHARSET utf8)
+    NO SQL
+BEGIN
+    SELECT @myLeft := lft FROM Category WHERE id = categoryId;
+
+    UPDATE Category SET rgt = rgt + 2 WHERE rgt > @myLeft;
+    UPDATE Category SET lft = lft + 2 WHERE lft > @myLeft;
+
+    INSERT INTO Category(name, lft, rgt) VALUES(name, @myLeft + 1, @myLeft + 2);
+END$$
+
+CREATE PROCEDURE removeCategory(IN categoryId INT(11))
     NO SQL
 BEGIN
     SELECT @myLeft := lft, @myRight := rgt, @myWidth := rgt - lft + 1
     FROM Category
-    WHERE `id` = categoryId;
+    WHERE id = categoryId;
     
     DELETE FROM Category WHERE lft BETWEEN @myLeft AND @myRight;
     
@@ -293,13 +385,13 @@ BEGIN
     UPDATE Category SET lft = lft - @myWidth WHERE lft > @myRight;
 END$$
 
-CREATE PROCEDURE `searchProductsByName`(IN `pName` VARCHAR(50))
+CREATE PROCEDURE searchProductsByName(IN pName VARCHAR(50))
     NO SQL
 BEGIN
 	SELECT * FROM Product WHERE name LIKE CONCAT('%', pName , '%');
 END$$
 
-CREATE PROCEDURE `searchShopsInCity`(IN `cityId` INT(11), IN `s` VARCHAR(50), IN `e` INT)
+CREATE PROCEDURE searchShopsInCity(IN cityId INT(11), IN s VARCHAR(50), IN e INT)
     NO SQL
 BEGIN
 	IF (e = 1) then 
@@ -316,43 +408,27 @@ END$$</pre>
         <div data-control>Triggers</div>
         <div data-content>
             <div>
-                <div data-accordion-group>
-                    <div class="accordion" data-accordion>
-                        <div data-control>ProductShop</div>
-                        <div data-content>
-                            <div>
                                 <pre class="prettyprint lang-sql">
-CREATE TRIGGER `change_product_count` AFTER UPDATE ON `ProductShop`
+CREATE TRIGGER `update_product_rating` AFTER INSERT ON `ProductReview`
  FOR EACH ROW BEGIN
-	IF (OLD.count = 0 AND NEW.count > 0) THEN
-    	UPDATE Shop SET productCount = productCount + 1 WHERE id = NEW.shop_id;
-    ELSEIF (OLD.count > 0 && NEW.count = 0) THEN
-    	UPDATE Shop SET productCount = productCount - 1 WHERE id = NEW.shop_id;
-    END IF;
-END</pre>
-                                <pre class="prettyprint lang-sql">
-CREATE TRIGGER `set_product_count` AFTER INSERT ON `ProductShop`
+	UPDATE Product SET rating = rating + NEW.points WHERE id = NEW.product_id;
+END
+
+CREATE TRIGGER `update_shop_rating` AFTER INSERT ON `ShopReview`
  FOR EACH ROW BEGIN
-	IF (NEW.count > 0) THEN
-    	UPDATE Shop SET productCount = productCount + 1 WHERE id = NEW.shop_id;
-    END IF;
-END</pre>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" data-accordion>
-                        <div data-control>Shop</div>
-                        <div data-content>
-                            <div>
-                                <pre class="prettyprint lang-sql">
+	UPDATE Shop SET rating = rating + NEW.points WHERE id = NEW.shop_id;
+END
+
+CREATE TRIGGER `update_prices` AFTER INSERT ON `ProductShop`
+ FOR EACH ROW BEGIN
+
+	SELECT AVG(price) INTO @avg_price FROM ProductShop
+END
+
 CREATE TRIGGER `change_city_shop_count` AFTER INSERT ON `Shop`
     FOR EACH ROW BEGIN
         UPDATE City SET shopCount = shopCount + 1 WHERE id = NEW.city_id;
-    END</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+END</pre>
             </div>
         </div>
     </div>

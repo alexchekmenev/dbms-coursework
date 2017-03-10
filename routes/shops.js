@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
     var explain = (req.query.explain == 1) || 0;
     var sql = '', params = [], pos = 0;
     if (search != null) {
-        sql = "SET @s = ?; SET @cityId = ?; SET @e = ?; CALL searchShopsInCity(@cityId, @s, @e);";
+        sql = "SET @s = ?; SET @cityId = ?; SET @e = ?; CALL searchShopsInCity(@cityId, @e, @s);";
         params = [search, city_id, explain];
         pos = 3;
     } else if (city_id != null && product_id != null) {
